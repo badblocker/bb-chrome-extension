@@ -111,7 +111,9 @@ function App() {
                     
                     
                 </div>
-                
+                <div>
+                    https://github.com/badblocker/bb-chrome-extension
+                </div>
             </div>
             <div className="bottom-0 flex fixed z-0 min-h-screen min-w-full flex-col-reverse">
                     <div className="self-end">

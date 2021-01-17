@@ -5,7 +5,9 @@
     "description": "BadBlocker Chrome Extension for voluntarily blocking web traffic to evil companies.",
     "icons": {
       "16": "icons/icon16.png",
+      "19": "icons/icon19.png",
       "48": "icons/icon48.png",
+      "60": "icons/icon60.png",
       "128": "icons/icon128.png"
     },
     "background": {
