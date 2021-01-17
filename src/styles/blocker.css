@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+
+.subheader{
+    color: theme('colors.red.DEFAULT');
+    font-size: 30px;
+    /* @apply container; */
+}
+
+
+.warning{
+    color: theme('colors.red.DEFAULT');
+    font-size: 150px;
+    text-shadow: -4px 4px theme('colors.blue.DEFAULT');
+}
+.text-blue{
+    color: theme('colors.blue.DEFAULT');
+}
+.text-red{
+    color: theme('colors.red.DEFAULT');
+}
+
+body{
+    font-family: "Montserrat";
+}
+
+.headerfont{
+    font-family: "Bebas Neue";
+}

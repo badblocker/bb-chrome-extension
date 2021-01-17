@@ -1,0 +1,28 @@
+{
+    "name": "BadBlocker",
+    "version": "0.0.1",
+    "manifest_version": 2,
+    "description": "BadBlocker Chrome Extension for voluntarily blocking web traffic to evil companies.",
+    "icons": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "background": {
+      "scripts": [
+        "js/background.js"
+      ],
+      "persistent": true
+    },
+    "permissions": [
+      "https://*/*",
+      "<all_urls>",
+      "declarativeContent",
+      "storage",
+      "webRequest", 
+      "webRequestBlocking",
+      "tabs"
+    ],
+    "options_page": "options.html"
+  }
+  

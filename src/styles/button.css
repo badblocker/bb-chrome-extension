@@ -1,0 +1,28 @@
+  
+  .button-default {
+    color: white;
+    background-color: teal;
+    text-align: center;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    margin: 10px;
+    display: inline-block;
+    border-radius:5px;
+  }
+  
+  .button-slanted {
+    -ms-transform: skewX(-7deg);
+    -webkit-transform: skewX(-7deg);
+    transform: skewX(-7deg);
+  }
+  
+  .button-slanted-content {
+    -ms-transform: skewX(7deg);
+    -webkit-transform: skewX(7deg);
+    transform: skewX(7deg);  
+    display: inline-block;
+  }
+  
+  .button-fixedwidth {
+    width: 100px;
+  }
