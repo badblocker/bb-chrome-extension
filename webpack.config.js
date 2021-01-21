@@ -6,7 +6,7 @@ module.exports = {
     watch: true,
     entry: {
         background: './src/app/background.ts',
-        blocker: './src/ui/blocker.tsx',
+        main: './src/ui/main.tsx',
     },
 
     output: {
@@ -15,14 +15,15 @@ module.exports = {
     },
 
     resolve: {
-        extensions: [".ts", ".tsx", ".js",".css"]
+        extensions: [".ts", ".tsx", ".js"]
     },
 
     module: {
         rules: [
+            
             { test: /\.tsx?$/, loader: "ts-loader" },
             {
-                test: /\.(png|jpe?g|gif)$/i,
+                test: /\.(png|jpe?g|gif|svg)$/i,
                 loader: 'file-loader',
                 options: {
                     name: '../img/[name].[ext]'
@@ -37,13 +38,23 @@ module.exports = {
                 ] 
             },
             {
-                test: /\.svg$/,
-                loader: 'svg-url-loader',
+                test: /\.(ttf|eot|woff|woff2)$/,
+                loader: 'file-loader',
                 options: {
-                    limit: 10000,
-                    name: '../img/[name].[ext]'
-                },
+                  name: '../fonts/[name].[ext]'
+                }
             }
+            // {
+            //     test: /\.svg$/,
+            //     use: {
+            //         loader: "svg-url-loader",
+            //         options: {
+            //             name: '../img/[name].[ext]',
+            //             limit: 10000
+            //         },
+            //     },
+            // },
+            
         ]
     },
 };

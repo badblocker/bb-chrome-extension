@@ -1,0 +1,10 @@
+{
+    "appName": {
+      "message": "BadBlocker",
+      "description": "The title of the application, displayed in the web store."
+    },
+    "appDesc": {
+      "message": "BadBlocker Chrome Extension for voluntarily blocking web traffic to evil companies.",
+      "description":"The description of the application, displayed in the web store."
+    }
+}

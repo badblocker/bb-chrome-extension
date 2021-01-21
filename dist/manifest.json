@@ -1,8 +1,9 @@
 {
-    "name": "BadBlocker",
+    "name": "__MSG_appName__",
     "version": "0.0.1",
     "manifest_version": 2,
-    "description": "BadBlocker Chrome Extension for voluntarily blocking web traffic to evil companies.",
+    "description": "__MSG_appDesc__",
+    "default_locale": "en",
     "icons": {
       "16": "icons/icon16.png",
       "19": "icons/icon19.png",
@@ -18,13 +19,11 @@
     },
     "permissions": [
       "https://*/*",
-      "<all_urls>",
-      "declarativeContent",
+      "http://*/*",
       "storage",
       "webRequest", 
-      "webRequestBlocking",
-      "tabs"
+      "webRequestBlocking"
     ],
-    "options_page": "options.html"
+    "options_page": "index.html"
   }
   

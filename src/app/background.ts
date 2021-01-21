@@ -1,7 +1,10 @@
+import { data } from 'autoprefixer';
 import micromatch from 'micromatch'
 import matchPatternToRegexp from './matcher'
 import recordList from './recordList'
 import searchList from './searchlist'
+import {localAsyncGet, localAsyncSet, localSyncSet, localSyncGet} from './storageChrome'
+
 
 
   //<a href="https://www.freepik.com/vectors/people">People vector created by freepik - www.freepik.com</a>
@@ -23,44 +26,71 @@ check: webpack.js.org TRUE
 */
 
 
+function matchUrl(url){
+  let searchable = Object.keys(searchList)
+  let key = searchable.findIndex(pattern=>{
+    // This attempts to use the same matching algorithm as chrome so we can find out 
+    // which record is the one we're looking at
+    let regex = matchPatternToRegexp('*://'+pattern);
+    return (url).match(regex)
+  })
+  return key
+}
+
+function refreshStoredRecord(key){
+  let domain = searchList[Object.keys(searchList)[key]] || ""
+  // console.log('\n\nrefreshStoredRecord domain', domain)
+  let storedRecord
+  try{
+    storedRecord = localSyncGet([domain])
+    // console.log('storedRecord', storedRecord)
+    storedRecord = JSON.parse(storedRecord || '{}') || {}
+  }
+  catch(err){
+    console.log(err)
+  }
+
+  let record = {
+    ...recordList[domain],
+    ignoreUntil: storedRecord.ignoreUntil || null
+  }
+  localSyncSet({
+   [domain]: JSON.stringify(record)
+  })
+
+  // console.log('record', domain, storedRecord, record)
+  return { domain, ignoreUntil:(record ||{}).ignoreUntil }
+}
+
+
+
 var callback = function(details) {
-    console.log(details)
-    var a = document.createElement('a');
-    a.href = details.url;
-    let searchable = Object.keys(searchList)
-    let key = searchable.findIndex(pattern=>{
-      // console.log('pattern',pattern)
-      let regex = matchPatternToRegexp('*://'+pattern);
-      // console.log('regex',regex)
-      return (details.url).match(regex)
-    })
+    // This function assumes a match has been made
+    // console.log(details)
+    // let domain = 'redzeppelin.com'
     
-    let name = searchList[Object.keys(searchList)[key]]
 
-    console.log('key', key)
-    // console.log(name)
-    // console.log(searchList[name])
-    console.log('record', recordList[name])
-    
-    let record = recordList[name]
-    let toStore = {}
-    toStore[name] = record
+    let key = matchUrl(details.url)
+    let { domain, ignoreUntil } = refreshStoredRecord(key)
 
-    console.log('toStore',toStore)
-    chrome.storage.local.set(toStore,()=>{
-      console.log(chrome.storage.local.get(name))
-    })
+    // if ignoreUntil is still in effect, carry on.
+    // console.log(domain, ignoreUntil)
+    if(!!ignoreUntil && Date.now() < ignoreUntil){
+      // console.log('ignoring until', ignoreUntil)
+      return {cancel:false}
+    }
 
-    return {redirectUrl: `chrome-extension://${chrome.runtime.id}/options.html?key=${name}`};
-
-    // Block the request
-    // return {cancel: true};
+    // else block the page  
+    let original = encodeURIComponent(details.url)
+    // return {redirectUrl: `chrome-extension://${chrome.runtime.id}/index.html#/block?key=${domain}&original=${original}`};
+    return {redirectUrl: `chrome-extension://${chrome.runtime.id}/index.html#/block?key=${domain}&original=${original}`};
   
-    
 };
 
 
 var searchListArray = Object.keys(searchList).map(url=>`*://${url}`)
+
+
 
 var filter = {urls: searchListArray}
 
@@ -72,29 +102,3 @@ var opt_extraInfoSpec = [
 chrome.webRequest.onBeforeRequest.addListener(
     callback, filter, opt_extraInfoSpec
 );
-
-chrome.runtime.onInstalled.addListener(function() {
-  chrome.storage.sync.set({color: '#3aa757'}, function() {
-    console.log("The color is green.");
-  });
-});
-
-
-  // "content_security_policy": "default-src 'self';"
-  
-  // "browser_action": {
-  //   "default_title": "TSRWPCX",
-  //   "default_popup": "popup.html"
-  // },
-      // "content_scripts": [
-      //   {
-      //     "matches": [
-      //       "https://*/*"
-      //     ],
-      //     "js": [
-      //       "js/content.js"
-      //     ]
-      //   }
-      // ]
-  
-  
