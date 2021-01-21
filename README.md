@@ -1,4 +1,5 @@
 # BadBlocker Chrome Extension
+
 ## Get started
 
 Clone the repo and run the following:

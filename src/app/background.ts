@@ -1,14 +1,10 @@
 import { data } from 'autoprefixer';
 import micromatch from 'micromatch'
 import matchPatternToRegexp from './matcher'
-import recordList from './recordList'
-import searchList from './searchlist'
-import {localAsyncGet, localAsyncSet, localSyncSet, localSyncGet} from './storageChrome'
+import recordList from './recordList.json'
+import searchList from './searchlist.json'
+import {localSyncSet, localSyncGet} from './storageChrome'
 
-
-
-  //<a href="https://www.freepik.com/vectors/people">People vector created by freepik - www.freepik.com</a>
-  //<a href="https://www.freepik.com/vectors/people">People vector created by pch.vector - www.freepik.com</a>
 
 /*   
 site: http://www.redzeppelinpizza.com/Menu.html

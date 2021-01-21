@@ -4,7 +4,7 @@
       "description": "The title of the application, displayed in the web store."
     },
     "appDesc": {
-      "message": "BadBlocker Chrome Extension for voluntarily blocking web traffic to evil companies.",
+      "message": "Helps you digitally boycott unethical or criminal persons and corporations, and recommends ethical alternatives.",
       "description":"The description of the application, displayed in the web store."
     }
 }
