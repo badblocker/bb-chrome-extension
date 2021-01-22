@@ -3,5 +3,5 @@
     "*.webpack.js.org/configuration/watch/": "webpack.js.org",
     "*.webpack.js.org/contribute/": "webpack.js.org",
     "*.example.com/*":"example.com",
-    "*.cnn.com/*":"cnn.com"
+    "*.cnn2.com/*":"cnn2.com"
 }
