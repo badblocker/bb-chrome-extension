@@ -1,3 +1,5 @@
 {
-
+    "*.redzeppelinpizza.com/*":"redzeppelinpizza.com",
+    "*.example.com/*":"example.com",
+    "*.cnn3.com/*":"cnn3.com"
 }
