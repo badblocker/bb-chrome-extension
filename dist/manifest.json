@@ -13,8 +13,7 @@
     },
     "background": {
       "scripts": [
-        "js/background.js",
-        "js/alarm.js"
+        "js/background.js"
       ],
       "persistent": true
     },

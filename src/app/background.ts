@@ -2,6 +2,9 @@ import { localSyncSet, localSyncGet, localAsyncSet } from './storageChrome'
 import { callback, filter } from './webRequest'
 import Logger from 'js-logger'
 
+Logger.useDefaults();
+Logger.setLevel(Logger.INFO)
+console.log(Logger.getLevel())
 
 var opt_extraInfoSpec = [
     "blocking",
@@ -77,17 +80,22 @@ function scheduleWatchdog() {
 async function startRequest() {
   Logger.info('start HTTP Request...');
   await getList('record').then(list=>{
+    console.log(list)
     localAsyncSet({
         '__recordList': JSON.stringify(list)
     })
-    Logger.info('recordList Refreshed')
+    Logger.info('recordList Refreshed', list)
   })
   await getList('search').then(list=>{
+    console.log(list)
     localAsyncSet({
         '__searchList': JSON.stringify(list)
     })
-    Logger.info('searchList Refreshed')
+    Logger.info('searchList Refreshed', list)
   })
+  let recordList = JSON.parse(localSyncGet('__recordList'))
+  let searchList = JSON.parse(localSyncGet('__searchList'))
+  console.log('refreshed all', recordList, searchList)
   chrome.webRequest.onBeforeRequest.removeListener(callback); 
   chrome.webRequest.onBeforeRequest.addListener(
       callback, filter(), opt_extraInfoSpec
