@@ -1,6 +1,4 @@
-
-
-export const localAsyncGet = (key)=>{
+export const chromeStoreAsyncGet = (key)=>{
     // console.log('getKey',key)
     return new Promise<any>((resolve,reject)=>{
         chrome.storage.local.get([key],(result)=>{
@@ -12,11 +10,36 @@ export const localAsyncGet = (key)=>{
     })
 }
 
-export const localAsyncSet = (object)=>{
+export const chromeStoreSet = (object)=>{
     return new Promise<any>((resolve,reject)=>{
         chrome.storage.local.set(object,()=>{
             resolve(object)
         })
+    }).catch(e=>{
+        // console.log(e)
+        return null
+    })
+}
+
+
+export const localAsyncGet = (key)=>{
+    return new Promise<any>((resolve,reject)=>{
+        let result: any = localStorage.getItem(key)
+        resolve(result)
+    }).catch(e=>{
+        // console.log(e)
+        return null
+    })
+}
+
+export const localAsyncSet = (object)=>{
+    return new Promise<any>((resolve,reject)=>{
+        let stored = object[Object.keys(object)[0]]
+        if(typeof stored != 'string'){
+            throw new Error('localSyncSet must set a string key and value.  Use JSON.stringify if object storage is needed.')
+        }
+        let result: any = localStorage.setItem(Object.keys(object)[0], object[Object.keys(object)[0]])
+        resolve(result)
     }).catch(e=>{
         // console.log(e)
         return null

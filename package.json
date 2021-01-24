@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx webpack",
-    "bundle": "zip -r bb.zip ./dist"
+    "start": "npx webpack --watch",
+    "build": "npx webpack --env NODE_ENV=local --progress",
+    "bundle": "npx webpack --env NODE_ENV=production --progress; zip -r bb.zip ./dist"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +33,8 @@
   },
   "dependencies": {
     "chrome-extension-async": "^3.4.1",
+    "copy-webpack-plugin": "^6.2.1",
+    "js-logger": "^1.6.1",
     "micromatch": "^4.0.2",
     "qs": "^6.9.6",
     "react": "^16.6.3",

@@ -62,12 +62,12 @@ function TransitionSwitch(props){
 
 async function getRecord(){
     let search = window.location.hash.match(/\?.*/)[0]
-    console.log('getRecord search',window.location)
+    // console.log('getRecord search',window.location)
     // let search = ""
     let querystring = qs.parse(search, { ignoreQueryPrefix: true })
-    console.log('query.key', querystring.key)
+    // console.log('query.key', querystring.key)
     let record = JSON.parse(localSyncGet(querystring.key))
-    console.log(record)
+    // console.log(record)
     return { record, key:querystring.key }
 }
 
@@ -94,7 +94,7 @@ async function ignoreOnce(data, original){
     let oneHour = 1000*60*60*12
     // let twelveHours = 10000
     let { record, key } = await getRecord()
-    console.log('ignoreOnce')
+    // console.log('ignoreOnce')
     localSyncSet({ 
         [key]: JSON.stringify({
             ...record,
@@ -119,6 +119,12 @@ async function ignoreForever(data, original){
     window.location.href = decodeURIComponent(original)
     // window.location.href = decodeURIComponent(original)
 
+}
+
+function clearStorage(){
+    console.log('Clearing Storage')
+    localSyncSet({'__searchList':'{}'})
+    localSyncSet({'__recordList':'{}'})
 }
 
 function IssueReference(links = []){
@@ -163,9 +169,9 @@ function BlockPage(){
     console.log('original', original)
     useEffect(() => {
         getRecord().then((result)=>{
-            let {record, key} = result
+            let {record={}, key} = result
             console.log('record', record)
-            let alts = record.alternatives || []
+            let alts = (record||{}).alternatives || []
             let alt = alts[Math.floor(Math.random() * alts.length)] || {}
             setData({
                 ...record,
@@ -215,11 +221,6 @@ function App() {
     return (
         <div className="popup-padded relative min-h-screen">
             <div className="container relative px-10 py-8 mx-auto">
-                <div className="headerfont text-blue underline pr-8">
-                    <Link to={{ pathname: '/block', search}}>
-                        
-                    </Link>
-                </div>
                 <div className="lg:absolute top-0 right-0 flex text-2xl pt-2 pb-8 mt-8 z-10">
                     <div className="headerfont text-blue underline pr-8">
                         <TransitionSwitch>
@@ -251,6 +252,9 @@ function App() {
                 <a href="https://github.com/badblocker/bb-chrome-extension">Open Source</a>
                 &nbsp;&nbsp;-&nbsp;&nbsp;
                 Copyright, BadBlocker 2021         
+            </div>
+            <div className="absolute right-0 bottom-0 z-10 px-7 py-2">
+                <button onClick={clearStorage}>&#928;</button>       
             </div>
             <div className="bottom-0 right-0 flex fixed z-0 min-h-screenflex-col-reverse"
                 style={{

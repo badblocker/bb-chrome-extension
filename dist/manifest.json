@@ -13,7 +13,8 @@
     },
     "background": {
       "scripts": [
-        "js/background.js"
+        "js/background.js",
+        "js/alarm.js"
       ],
       "persistent": true
     },
@@ -22,8 +23,8 @@
       "http://*/*",
       "storage",
       "webRequest", 
-      "webRequestBlocking"
+      "webRequestBlocking",
+      "alarms"
     ],
     "options_page": "index.html"
   }
-  

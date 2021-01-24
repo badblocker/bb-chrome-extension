@@ -1,100 +1,106 @@
-import { data } from 'autoprefixer';
-import micromatch from 'micromatch'
-import matchPatternToRegexp from './matcher'
-import recordList from './recordList.json'
-import searchList from './searchlist.json'
-import {localSyncSet, localSyncGet} from './storageChrome'
+import { localSyncSet, localSyncGet, localAsyncSet } from './storageChrome'
+import { callback, filter } from './webRequest'
+import Logger from 'js-logger'
 
-
-/*   
-site: http://www.redzeppelinpizza.com/Menu.html
-check: redzeppelinpizza.com TRUE
-check: www.redzeppelinpizza.com TRUE
-check: www.redzeppelinpizza.com/Menu.html TRUE
-checkL www.redzeppelinpizza.com/Home.html FALSE
-*/
-
-/*
-site: https://webpack.js.org/configuration
-check: webpack.js.org/configuration/watch TRUE
-check: webpack.js.org/contribute FALSE
-check: webpack.js.org TRUE
-*/
-
-
-function matchUrl(url){
-  let searchable = Object.keys(searchList)
-  let key = searchable.findIndex(pattern=>{
-    // This attempts to use the same matching algorithm as chrome so we can find out 
-    // which record is the one we're looking at
-    let regex = matchPatternToRegexp('*://'+pattern);
-    return (url).match(regex)
-  })
-  return key
-}
-
-function refreshStoredRecord(key){
-  let domain = searchList[Object.keys(searchList)[key]] || ""
-  // console.log('\n\nrefreshStoredRecord domain', domain)
-  let storedRecord
-  try{
-    storedRecord = localSyncGet([domain])
-    // console.log('storedRecord', storedRecord)
-    storedRecord = JSON.parse(storedRecord || '{}') || {}
-  }
-  catch(err){
-    console.log(err)
-  }
-
-  let record = {
-    ...recordList[domain],
-    ignoreUntil: storedRecord.ignoreUntil || null
-  }
-  localSyncSet({
-   [domain]: JSON.stringify(record)
-  })
-
-  // console.log('record', domain, storedRecord, record)
-  return { domain, ignoreUntil:(record ||{}).ignoreUntil }
-}
-
-
-
-var callback = function(details) {
-    // This function assumes a match has been made
-    // console.log(details)
-    // let domain = 'redzeppelin.com'
-    
-
-    let key = matchUrl(details.url)
-    let { domain, ignoreUntil } = refreshStoredRecord(key)
-
-    // if ignoreUntil is still in effect, carry on.
-    // console.log(domain, ignoreUntil)
-    if(!!ignoreUntil && Date.now() < ignoreUntil){
-      // console.log('ignoring until', ignoreUntil)
-      return {cancel:false}
-    }
-
-    // else block the page  
-    let original = encodeURIComponent(details.url)
-    // return {redirectUrl: `chrome-extension://${chrome.runtime.id}/index.html#/block?key=${domain}&original=${original}`};
-    return {redirectUrl: `chrome-extension://${chrome.runtime.id}/index.html#/block?key=${domain}&original=${original}`};
-  
-};
-
-
-var searchListArray = Object.keys(searchList).map(url=>`*://${url}`)
-
-
-
-var filter = {urls: searchListArray}
 
 var opt_extraInfoSpec = [
-  "blocking",
-  "requestBody"
+    "blocking",
+    "requestBody"
 ];
 
-chrome.webRequest.onBeforeRequest.addListener(
-    callback, filter, opt_extraInfoSpec
-);
+async function getList(name){
+  let url = `https://raw.githubusercontent.com/badblocker/bb-chrome-extension/main/dist/js/${name}List.json`
+  var myHeaders = new Headers();
+  myHeaders.append("Accept", "application/json");
+  myHeaders.append("Content-Type", "text/plain");
+  
+  var requestOptions:object = {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow'
+  };
+  
+  let newList = await fetch(url, requestOptions)
+    .then(response => response.json())
+    .catch(error => Logger.error(error));
+  //   console.log(newList)
+  return newList
+}
+ 
+
+// fetch and save data when chrome restarted, alarm will continue running when chrome is restarted
+chrome.runtime.onStartup.addListener(() => {
+  Logger.info('onStartup....');
+  startRequest();
+});
+  
+// alarm listener
+chrome.alarms.onAlarm.addListener(alarm => {
+  // if watchdog is triggered, check whether refresh alarm is there
+  if (alarm && alarm.name === 'watchdog') {
+    chrome.alarms.get('refresh', alarm => {
+      if (alarm) {
+        Logger.info('Refresh alarm exists. Yay.');
+      } else {
+        // if it is not there, start a new request and reschedule refresh alarm
+        Logger.info("Refresh alarm doesn't exist, starting a new one");
+        startRequest();
+        scheduleRequest();
+      }
+    });
+  } else {
+    // if refresh alarm triggered, start a new request
+    startRequest();
+  }
+});
+
+
+
+
+// schedule a new fetch every 30 minutes
+function scheduleRequest() {
+  Logger.info('schedule refresh alarm to 30 minutes...');
+  chrome.alarms.create('refresh', { periodInMinutes: 2 });
+}
+  
+
+
+// schedule a watchdog check every 5 minutes
+function scheduleWatchdog() {
+  Logger.info('schedule watchdog alarm to 5 minutes...');
+  chrome.alarms.create('watchdog', { periodInMinutes: 1 });
+}
+  
+
+
+// fetch data and save to local storage
+async function startRequest() {
+  Logger.info('start HTTP Request...');
+  await getList('record').then(list=>{
+    localAsyncSet({
+        '__recordList': JSON.stringify(list)
+    })
+    Logger.info('recordList Refreshed')
+  })
+  await getList('search').then(list=>{
+    localAsyncSet({
+        '__searchList': JSON.stringify(list)
+    })
+    Logger.info('searchList Refreshed')
+  })
+  chrome.webRequest.onBeforeRequest.removeListener(callback); 
+  chrome.webRequest.onBeforeRequest.addListener(
+      callback, filter(), opt_extraInfoSpec
+  );  
+}
+
+// create alarm for watchdog and fresh on installed/updated, and start fetch data
+chrome.runtime.onInstalled.addListener(() => {
+  Logger.info('onInstalled....');
+  localSyncSet({'__searchList':'{}'})
+  localSyncSet({'__recordList':'{}'})
+  scheduleRequest();
+  scheduleWatchdog();
+  startRequest(); 
+});
+  
